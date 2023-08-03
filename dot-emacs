@@ -1,0 +1,205 @@
+;; Stephe's logging for ada-mode
+(setq ada-process-parse-exec-opts
+      '("--recover-log" "/Users/simon/ada-mode/recover.log"))
+
+;; map the right option key to 'super'.
+(setq ns-right-option-modifier 'super)
+;; 'sensible' drag-n-drop
+(define-key global-map [ns-drag-file] 'ns-find-file)
+;; shortcut for goto line
+(global-set-key "\M-g" 'goto-line)
+;; toggle the menu bar (no use if inhibited)
+(global-set-key [f5] (lambda () (interactive) (menu-bar-mode t)))
+
+(setq enable-local-variables 1)
+(put 'narrow-to-region 'disabled nil)
+(put 'eval-expression 'disabled nil)
+(put 'downcase-region 'disabled nil)
+(put 'upcase-region 'disabled nil)
+
+;; (add-hook
+;;  'verilog-mode-hook
+;;  (lambda() (add-to-list
+;;             'mouse-buffer-menu-mode-groups
+;;             '("Verilog" . "Verilog")
+;;             t)))
+
+(add-to-list 'mouse-buffer-menu-mode-groups '("Verilog" . "Verilog") t)
+
+;; override tiresome default skeleton-insert behaviour
+(setq skeleton-end-newline nil)
+
+;;; from http://www.emacswiki.org/emacs/RevertBuffer
+(defun revert-all-buffers ()
+  "Refreshes all open buffers from their respective files."
+  (interactive)
+  (dolist (buf (buffer-list))
+    (with-current-buffer buf
+      (when (and (buffer-file-name) (not (buffer-modified-p)))
+        (revert-buffer t t nil) )))
+  (message "Refreshed open files."))
+
+;;; from http://www.emacswiki.org/emacs/CommentingCode
+(defun comment-eclipse ()
+  (interactive)
+  (let ((start (line-beginning-position))
+        (end (line-end-position)))
+    (when (region-active-p)
+      (setq start (save-excursion
+                    (goto-char (region-beginning))
+                    (beginning-of-line)
+                    (point))
+            end (save-excursion
+                  (goto-char (region-end))
+                  (end-of-line)
+                  (point))))
+    (comment-or-uncomment-region start end)))
+(global-set-key "\M-;" 'comment-eclipse)
+
+;; basic initialization done
+
+;; whence ada-mode?
+(setq ada-mode-local nil)
+
+;; Packages
+(require 'package)
+(setq package-enable-at-startup nil)
+(package-initialize)
+;; ELPA packages can now be (require)'d & configured as normal
+
+(server-start)
+
+(message (concat "initial path: " (getenv "PATH")))
+
+;; (setenv "PATH" (concat
+;;                 "/opt/gcc-12.2.0/bin:"
+;;                 "/usr/local/bin:"
+;;                 (getenv "PATH")
+;;                 ":~/bin"
+;;                 ":/usr/local/MacGPG2/bin"))
+
+;; (setenv "PATH" (concat
+;;                 "/opt/gcc-13-20230129/bin:"
+;;                 (getenv "PATH")))
+
+;; (setq GCC "/opt/gcc-12.2.0")
+;; ;; (setenv "SDKROOT"
+;; ;;        (substring (shell-command-to-string "xcrun --show-sdk-path") 0 -1))
+;; (setenv "PATH" (concat GCC "/bin:" (getenv "PATH")))
+;; (setenv "GNAT_PREFIX" GCC)
+
+(add-to-list 'load-path (expand-file-name "~/Developer/elisp"))
+(add-to-list 'load-path (expand-file-name "~/Developer/xslide-0.2.2"))
+
+;; nuweb support
+(add-to-list 'load-path (expand-file-name "~/Developer/nuweb.py"))
+(add-to-list 'load-path (expand-file-name "~/Developer/poly/polymode"))
+(require 'poly-nuweb)
+
+(if ada-mode-local
+    (progn
+      (add-to-list 'load-path
+                   (expand-file-name "~/Developer/ada-mode/org.emacs.ada-mode"))
+      (add-to-list 'load-path
+                   (expand-file-name "~/Developer/ada-mode/org.emacs.wisi"))
+      (load-library "autoloads.el")
+      (setenv
+       "PATH"
+       (concat (expand-file-name "~/Developer/ada-mode/org.emacs.ada-mode")
+               ":"
+               (getenv "PATH")))))
+
+(defun bring-alire-path-elements-to-front ()
+  (let* ((split-path (split-string (getenv "PATH") path-separator))
+         (alire-elements
+          (seq-filter
+           (lambda (elt) (string-match "alire/cache/dependencies" elt))
+           split-path))
+         (non-alire-elements
+          (seq-filter
+           (lambda (elt) (not (string-match "alire/cache/dependencies" elt)))
+           split-path)))
+    (string-join (append alire-elements split-path) ":")))
+
+(setenv "PATH" (bring-alire-path-elements-to-front))
+
+;; I think we have all the PATH possibilities set up now.
+(setq exec-path (append (split-string (getenv "PATH") path-separator)
+                        (list exec-directory)))
+
+;(require 'enscript-print)
+
+(require 'other-frame-window)
+(require 'ada-mode)
+(add-hook
+ 'ada-mode-hook
+ (lambda()
+   (setq-local comment-padding "  ")
+   (add-hook `before-save-hook `delete-trailing-whitespace nil t)
+   (add-hook 'before-save-hook
+             (lambda () (untabify (point-min) (point-max))) nil t)
+   (add-hook 'project-find-functions #'wisi-prj-current-cached nil t)
+   (add-hook 'xref-backend-functions #'wisi-prj-xref-backend nil t)
+   ))
+
+;; ---  Imenu support & settings  ---
+(require 'ada-imenu)  ; calls in imenu (& ada-mode)
+
+(add-hook 'c-mode-hook (lambda() (imenu-add-to-menubar "Entities")))
+(add-hook 'emacs-lisp-mode-hook (lambda() (imenu-add-to-menubar "Entities")))
+(add-hook 'python-mode-hook (lambda() (imenu-add-to-menubar "Entities")))
+(setq imenu-auto-rescan t)   ;;; set to t if we should always rescan
+(setq imenu-case-fold-search t)
+(setq imenu-sort-function 'imenu--sort-by-name)
+(setq imenu-use-markers nil) ;;; if we automatically rescan, use positions
+(setq imenu-scanning-message nil) ;;; no message should be displayed
+
+;;; this for .gpr file editing
+(require 'gpr-mode)
+(add-hook
+ 'gpr-mode-hook
+ (lambda()
+   (setq-local comment-padding "  ")
+   (add-hook 'before-save-hook
+             (lambda () (untabify (point-min) (point-max))) nil t)
+   (add-hook `before-save-hook `delete-trailing-whitespace) nil t))
+
+(transient-mark-mode t)
+
+;; XSL mode
+(autoload 'xsl-mode "xslide" "Major mode for XSL stylesheets." t)
+(push '("\\.xsl$" . xsl-mode) auto-mode-alist)
+(add-hook 'xsl-mode-hook 'turn-on-font-lock)
+
+;; Python
+(push '("\\.py$" . python-mode) auto-mode-alist)
+
+;; Tcl
+(push '("\\.tcl$" . tcl-mode) auto-mode-alist)
+
+;; Wikipedia
+(autoload 'wikipedia-mode "wikipedia-mode"
+  "Major mode for editing documents in Wikipedia markup." t)
+(push '("\\.wiki$" . wikipedia-mode) auto-mode-alist)
+
+;; Longlines minor mode
+(autoload 'longlines-mode "longlines.el"
+  "Minor mode for editing long lines." t)
+
+;; Markdown
+(autoload 'markdown-mode "markdown-mode"
+  "Major mode for editing Markdown files" t)
+(add-to-list 'auto-mode-alist '("\\.markdown\\'" . markdown-mode))
+(add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode))
+
+;; Yaml
+(require 'yaml-mode)
+(add-to-list 'auto-mode-alist '("\\.yml\\'" . yaml-mode))
+
+;; Not sure this is a good idea?
+(add-hook 'yaml-mode-hook
+          '(lambda ()
+             (define-key yaml-mode-map "\C-m" 'newline-and-indent)))
+
+;; Custom
+(load "~/.emacs-custom.el")
