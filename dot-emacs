@@ -1,6 +1,6 @@
 ;; Stephe's logging for ada-mode
 (setq ada-process-parse-exec-opts
-      '("--recover-log" "/Users/simon/ada-mode/recover.log"))
+      '("--recover-log" "/Users/simon/tmp/ada-mode-log/recover.log"))
 
 ;; map the right option key to 'super'.
 (setq ns-right-option-modifier 'super)
