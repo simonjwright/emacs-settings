@@ -62,12 +62,11 @@
  '(ns-pop-up-frames nil)
  '(package-archives '(("gnu" . "http://elpa.gnu.org/packages/")))
  '(package-selected-packages
-   '(gpr-mode ada-mode markdown-preview-mode other-frame-window ada-ref-man))
+   '(gpr-query gpr-mode ada-mode markdown-preview-mode other-frame-window ada-ref-man))
  '(python-check-command "python -m flake8")
  '(scroll-bar-mode 'right)
  '(send-mail-function 'mailclient-send-it)
  '(sgml-basic-offset 0)
- '(show-paren-mode t nil (paren))
  '(tex-font-script-display '(-0.0 0.0))
  '(tex-suscript-height-ratio 1.0)
  '(tool-bar-mode nil nil (tool-bar))
@@ -81,4 +80,4 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(default ((t (:height 140 :family "Inconsolata")))))
+ '(default ((t (:height 140 :family "Inconsolata" :foundry "nil" :slant normal :weight medium :width normal)))))
