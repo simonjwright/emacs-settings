@@ -47,6 +47,7 @@
 ;; basic initialization done
 
 ;; Packages
+(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
 (require 'package)
 (setq package-enable-at-startup nil)
 (package-initialize)
@@ -68,11 +69,11 @@
   (let* ((split-path (split-string (getenv "PATH") path-separator))
          (alire-elements
           (seq-filter
-           (lambda (elt) (string-match "alire/cache/dependencies" elt))
+           (lambda (elt) (string-match "alire/" elt))
            split-path))
          (non-alire-elements
           (seq-filter
-           (lambda (elt) (not (string-match "alire/cache/dependencies" elt)))
+           (lambda (elt) (not (string-match "alire/" elt)))
            split-path)))
     (string-join (append alire-elements split-path) ":")))
 
@@ -111,7 +112,7 @@
 (push '("\\.xsl$" . xsl-mode) auto-mode-alist)
 (add-hook 'xsl-mode-hook 'turn-on-font-lock)
 
-;; Anod
+;; Anod (AdaCore special?)
 (push '("\\.anod$" . python-mode) auto-mode-alist)
 
 ;; Python
