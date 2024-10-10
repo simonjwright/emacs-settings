@@ -1,6 +1,4 @@
-;; Stephe's logging for ada-mode
-(setq ada-process-parse-exec-opts
-      '("--recover-log" "/Users/simon/tmp/ada-mode-log/recover.log"))
+;; -*- lisp -*-
 
 ;; map the right option key to 'super'.
 (setq ns-right-option-modifier 'super)
@@ -16,6 +14,8 @@
 (put 'eval-expression 'disabled nil)
 (put 'downcase-region 'disabled nil)
 (put 'upcase-region 'disabled nil)
+
+(transient-mark-mode t)
 
 ;; (add-hook
 ;;  'verilog-mode-hook
@@ -58,35 +58,15 @@
 
 ;; basic initialization done
 
-;; whence ada-mode?
-(setq ada-mode-local nil)
-
 ;; Packages
 (require 'package)
-(setq package-enable-at-startup nil)
 (package-initialize)
+;(setq package-enable-at-startup nil)
 ;; ELPA packages can now be (require)'d & configured as normal
 
 (server-start)
 
 (message (concat "initial path: " (getenv "PATH")))
-
-;; (setenv "PATH" (concat
-;;                 "/opt/gcc-12.2.0/bin:"
-;;                 "/usr/local/bin:"
-;;                 (getenv "PATH")
-;;                 ":~/bin"
-;;                 ":/usr/local/MacGPG2/bin"))
-
-;; (setenv "PATH" (concat
-;;                 "/opt/gcc-13-20230129/bin:"
-;;                 (getenv "PATH")))
-
-;; (setq GCC "/opt/gcc-12.2.0")
-;; ;; (setenv "SDKROOT"
-;; ;;        (substring (shell-command-to-string "xcrun --show-sdk-path") 0 -1))
-;; (setenv "PATH" (concat GCC "/bin:" (getenv "PATH")))
-;; (setenv "GNAT_PREFIX" GCC)
 
 (add-to-list 'load-path (expand-file-name "~/Developer/elisp"))
 (add-to-list 'load-path (expand-file-name "~/Developer/xslide-0.2.2"))
@@ -95,19 +75,6 @@
 (add-to-list 'load-path (expand-file-name "~/Developer/nuweb.py"))
 (add-to-list 'load-path (expand-file-name "~/Developer/poly/polymode"))
 (require 'poly-nuweb)
-
-(if ada-mode-local
-    (progn
-      (add-to-list 'load-path
-                   (expand-file-name "~/Developer/ada-mode/org.emacs.ada-mode"))
-      (add-to-list 'load-path
-                   (expand-file-name "~/Developer/ada-mode/org.emacs.wisi"))
-      (load-library "autoloads.el")
-      (setenv
-       "PATH"
-       (concat (expand-file-name "~/Developer/ada-mode/org.emacs.ada-mode")
-               ":"
-               (getenv "PATH")))))
 
 (defun bring-alire-path-elements-to-front ()
   (let* ((split-path (split-string (getenv "PATH") path-separator))
@@ -127,44 +94,17 @@
 (setq exec-path (append (split-string (getenv "PATH") path-separator)
                         (list exec-directory)))
 
-;(require 'enscript-print)
-
-(require 'other-frame-window)
-(require 'ada-mode)
-(add-hook
- 'ada-mode-hook
- (lambda()
-   (setq-local comment-padding "  ")
-   (add-hook `before-save-hook `delete-trailing-whitespace nil t)
-   (add-hook 'before-save-hook
-             (lambda () (untabify (point-min) (point-max))) nil t)
-   (add-hook 'project-find-functions #'wisi-prj-current-cached nil t)
-   (add-hook 'xref-backend-functions #'wisi-prj-xref-backend nil t)
-   ))
-
-;; ---  Imenu support & settings  ---
-(require 'ada-imenu)  ; calls in imenu (& ada-mode)
+;; ada-ts-mode settings from dotemacs-ada
+(load "~/.emacs-ada.el")
 
 (add-hook 'c-mode-hook (lambda() (imenu-add-to-menubar "Entities")))
 (add-hook 'emacs-lisp-mode-hook (lambda() (imenu-add-to-menubar "Entities")))
 (add-hook 'python-mode-hook (lambda() (imenu-add-to-menubar "Entities")))
-(setq imenu-auto-rescan t)   ;;; set to t if we should always rescan
-(setq imenu-case-fold-search t)
-(setq imenu-sort-function 'imenu--sort-by-name)
-(setq imenu-use-markers nil) ;;; if we automatically rescan, use positions
-(setq imenu-scanning-message nil) ;;; no message should be displayed
-
-;;; this for .gpr file editing
-(require 'gpr-mode)
-(add-hook
- 'gpr-mode-hook
- (lambda()
-   (setq-local comment-padding "  ")
-   (add-hook 'before-save-hook
-             (lambda () (untabify (point-min) (point-max))) nil t)
-   (add-hook `before-save-hook `delete-trailing-whitespace) nil t))
-
-(transient-mark-mode t)
+;; (setq imenu-auto-rescan t)   ;;; set to t if we should always rescan
+;; (setq imenu-case-fold-search t)
+;; (setq imenu-sort-function 'imenu--sort-by-name)
+;; (setq imenu-use-markers nil) ;;; if we automatically rescan, use positions
+;; (setq imenu-scanning-message nil) ;;; no message should be displayed
 
 ;; XSL mode
 (autoload 'xsl-mode "xslide" "Major mode for XSL stylesheets." t)
