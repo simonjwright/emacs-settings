@@ -1,9 +1,5 @@
 ;; -*- lisp -*-
 
-;; Stephe's logging for ada-mode
-(setq ada-process-parse-exec-opts
-      '("--recover-log" "/Users/simon/tmp/ada-mode-log/recover.log"))
-
 ;; map the right option key to 'super'.
 (setq ns-right-option-modifier 'super)
 ;; 'sensible' drag-n-drop
@@ -19,17 +15,7 @@
 (put 'downcase-region 'disabled nil)
 (put 'upcase-region 'disabled nil)
 
-;; (add-hook
-;;  'verilog-mode-hook
-;;  (lambda() (add-to-list
-;;             'mouse-buffer-menu-mode-groups
-;;             '("Verilog" . "Verilog")
-;;             t)))
-
-(add-to-list 'mouse-buffer-menu-mode-groups '("Verilog" . "Verilog") t)
-
-;; override tiresome default skeleton-insert behaviour
-(setq skeleton-end-newline nil)
+(transient-mark-mode t)
 
 ;;; from http://www.emacswiki.org/emacs/RevertBuffer
 (defun revert-all-buffers ()
@@ -60,9 +46,6 @@
 
 ;; basic initialization done
 
-;; whence ada-mode?
-(setq ada-mode-local nil)
-
 ;; Packages
 (require 'package)
 (setq package-enable-at-startup nil)
@@ -73,23 +56,6 @@
 
 (message (concat "initial path: " (getenv "PATH")))
 
-;; (setenv "PATH" (concat
-;;                 "/opt/gcc-12.2.0/bin:"
-;;                 "/usr/local/bin:"
-;;                 (getenv "PATH")
-;;                 ":~/bin"
-;;                 ":/usr/local/MacGPG2/bin"))
-
-;; (setenv "PATH" (concat
-;;                 "/opt/gcc-13-20230129/bin:"
-;;                 (getenv "PATH")))
-
-;; (setq GCC "/opt/gcc-12.2.0")
-;; ;; (setenv "SDKROOT"
-;; ;;        (substring (shell-command-to-string "xcrun --show-sdk-path") 0 -1))
-;; (setenv "PATH" (concat GCC "/bin:" (getenv "PATH")))
-;; (setenv "GNAT_PREFIX" GCC)
-
 (add-to-list 'load-path (expand-file-name "~/Developer/elisp"))
 (add-to-list 'load-path (expand-file-name "~/Developer/xslide-0.2.2"))
 
@@ -97,19 +63,6 @@
 (add-to-list 'load-path (expand-file-name "~/Developer/nuweb.py"))
 (add-to-list 'load-path (expand-file-name "~/Developer/poly/polymode"))
 (require 'poly-nuweb)
-
-(if ada-mode-local
-    (progn
-      (add-to-list 'load-path
-                   (expand-file-name "~/Developer/ada-mode/org.emacs.ada-mode"))
-      (add-to-list 'load-path
-                   (expand-file-name "~/Developer/ada-mode/org.emacs.wisi"))
-      (load-library "autoloads.el")
-      (setenv
-       "PATH"
-       (concat (expand-file-name "~/Developer/ada-mode/org.emacs.ada-mode")
-               ":"
-               (getenv "PATH")))))
 
 (defun bring-alire-path-elements-to-front ()
   (let* ((split-path (split-string (getenv "PATH") path-separator))
@@ -129,23 +82,11 @@
 (setq exec-path (append (split-string (getenv "PATH") path-separator)
                         (list exec-directory)))
 
-;(require 'enscript-print)
-
-(require 'other-frame-window)
-(require 'ada-mode)
-(add-hook
- 'ada-mode-hook
- (lambda()
-   (setq-local comment-padding "  ")
-   (add-hook `before-save-hook `delete-trailing-whitespace nil t)
-   (add-hook 'before-save-hook
-             (lambda () (untabify (point-min) (point-max))) nil t)
-   (add-hook 'project-find-functions #'wisi-prj-current-cached nil t)
-   (add-hook 'xref-backend-functions #'wisi-prj-xref-backend nil t)
-   ))
+;;; Ada-special settings
+(load "~/.emacs-ada.el")
 
 ;; ---  Imenu support & settings  ---
-(require 'ada-imenu)  ; calls in imenu (& ada-mode)
+(require 'imenu)
 
 (add-hook 'c-mode-hook (lambda() (imenu-add-to-menubar "Entities")))
 (add-hook 'emacs-lisp-mode-hook (lambda() (imenu-add-to-menubar "Entities")))
@@ -156,17 +97,14 @@
 (setq imenu-use-markers nil) ;;; if we automatically rescan, use positions
 (setq imenu-scanning-message nil) ;;; no message should be displayed
 
-;;; this for .gpr file editing
-(require 'gpr-mode)
-(add-hook
- 'gpr-mode-hook
- (lambda()
-   (setq-local comment-padding "  ")
-   (add-hook 'before-save-hook
-             (lambda () (untabify (point-min) (point-max))) nil t)
-   (add-hook `before-save-hook `delete-trailing-whitespace) nil t))
+;; (add-hook
+;;  'verilog-mode-hook
+;;  (lambda() (add-to-list
+;;             'mouse-buffer-menu-mode-groups
+;;             '("Verilog" . "Verilog")
+;;             t)))
 
-(transient-mark-mode t)
+(add-to-list 'mouse-buffer-menu-mode-groups '("Verilog" . "Verilog") t)
 
 ;; XSL mode
 (autoload 'xsl-mode "xslide" "Major mode for XSL stylesheets." t)
