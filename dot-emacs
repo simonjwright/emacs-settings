@@ -1,3 +1,5 @@
+;; -*- lisp -*-
+
 ;; Stephe's logging for ada-mode
 (setq ada-process-parse-exec-opts
       '("--recover-log" "/Users/simon/tmp/ada-mode-log/recover.log"))

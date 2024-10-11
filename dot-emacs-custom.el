@@ -60,7 +60,9 @@
  '(ns-alternate-modifier 'none)
  '(ns-command-modifier 'meta)
  '(ns-pop-up-frames nil)
- '(package-archives '(("gnu" . "http://elpa.gnu.org/packages/")))
+ '(package-archives
+   '(("gnu" . "http://elpa.gnu.org/packages/")
+     ("melpa" . "https://melpa.org/packages/")))
  '(package-selected-packages
    '(gpr-query gpr-mode ada-mode markdown-preview-mode other-frame-window ada-ref-man))
  '(python-check-command "python -m flake8")
