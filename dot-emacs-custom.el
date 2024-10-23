@@ -20,6 +20,7 @@
  '(ada-process-parse-exec-opts
    '("--recover-log" "/Users/simon/Developer/ada-mode/recover.log"))
  '(ada-skel-initial-string "")
+ '(ada-ts-mode-indent-backend 'lsp)
  '(before-save-hook nil)
  '(c-basic-offset 2)
  '(canlock-password "574cc640a3673e23b6401102b43514ca2f7cecb6")
@@ -64,7 +65,7 @@
    '(("gnu" . "http://elpa.gnu.org/packages/")
      ("melpa" . "https://melpa.org/packages/")))
  '(package-selected-packages
-   '(gpr-mode gpr-query eglot ada-mode markdown-preview-mode other-frame-window ada-ref-man))
+   '(gpr-yasnippets eglot company yasnippet gpr-ts-mode lsp-mode ada-ts-mode gpr-query gpr-mode ada-mode markdown-preview-mode other-frame-window ada-ref-man))
  '(python-check-command "python -m flake8")
  '(scroll-bar-mode 'right)
  '(send-mail-function 'mailclient-send-it)
