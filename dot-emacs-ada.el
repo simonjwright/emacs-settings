@@ -1,6 +1,4 @@
-;; ada-ts-mode & friends, from dotemacs-ada.
-
-(message ".emacs-ada.el is here!")
+;; ada-ts-mode & friends, from .emacs-ada.el
 
 (setq init.el/preferred-lsp-client 'lsp-mode)
 
@@ -42,6 +40,33 @@
      (add-hook 'before-save-hook
                (lambda () (untabify (point-min) (point-max))) nil t)     
      )))
+
+;;;; Project
+
+(defun ada-mode--find-alire (dir)
+  (let ((alire (locate-dominating-file dir "alire.toml")))
+    (if alire
+      (cons 'transient alire)
+      nil)))
+
+(defun ada-mode--find-gpr (dir)
+  (let ((gpr (locate-dominating-file
+              dir
+              (lambda (dir) (directory-files dir nil "gpr"))
+              )))
+    (if gpr
+      (cons 'transient gpr)
+      nil)))
+
+(use-package project
+  :config
+  ;; last-in, first-used.
+  ;; can't use :hook because the hook variable doesn't end with -hook.
+  (add-hook 'project-find-functions #'ada-mode--find-gpr)
+  (add-hook 'project-find-functions #'ada-mode--find-alire)
+  ;; :custom
+  ;; (project-vc-extra-root-markers '("alire.toml" "*.gpr"))
+  )
 
 ;;;; Company
 
