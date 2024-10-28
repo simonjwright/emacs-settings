@@ -64,7 +64,7 @@
    '(("gnu" . "http://elpa.gnu.org/packages/")
      ("melpa" . "https://melpa.org/packages/")))
  '(package-selected-packages
-   '(ada-ts-mode gpr-query gpr-mode ada-mode markdown-preview-mode other-frame-window ada-ref-man))
+   '(gpr-query gpr-mode ada-mode markdown-preview-mode other-frame-window ada-ref-man))
  '(python-check-command "python -m flake8")
  '(scroll-bar-mode 'right)
  '(send-mail-function 'mailclient-send-it)
