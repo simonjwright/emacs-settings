@@ -1,4 +1,6 @@
-;; ada-ts-mode & friends, from .emacs-ada.el
+;;;; .emacs-ada.el
+;;;; Derived from Troy Brown's `init.el` here:
+;;;; https://github.com/brownts/dotemacs-ada
 
 (setq init.el/preferred-lsp-client 'lsp-mode)
 
@@ -44,12 +46,16 @@
 ;;;; Project
 
 (defun ada-mode--find-alire (dir)
+  ;; Look up-tree, starting at dir, for alire.toml; return its full
+  ;; path name if found, nil if not.
   (let ((alire (locate-dominating-file dir "alire.toml")))
     (if alire
       (cons 'transient alire)
       nil)))
 
 (defun ada-mode--find-gpr (dir)
+  ;; Look up-tree, starting at dir, for a .gpr file, returning its
+  ;; full path name if found, nil if not.
   (let ((gpr (locate-dominating-file
               dir
               (lambda (dir) (directory-files dir nil "gpr"))
@@ -64,8 +70,11 @@
   ;; can't use :hook because the hook variable doesn't end with -hook.
   (add-hook 'project-find-functions #'ada-mode--find-gpr)
   (add-hook 'project-find-functions #'ada-mode--find-alire)
-  ;; :custom
-  ;; (project-vc-extra-root-markers '("alire.toml" "*.gpr"))
+
+  ;; As an alternative, we could say this
+  ;;     :custom
+  ;;     (project-vc-extra-root-markers '("alire.toml" "*.gpr"))
+  ;; but we prefer alire.toml to a .gpr file in a lower directory.
   )
 
 ;;;; Company

@@ -9,7 +9,7 @@
 ;; toggle the menu bar (no use if inhibited)
 (global-set-key [f5] (lambda () (interactive) (menu-bar-mode t)))
 ;; rebind the mouse-buffer-menu; the default is used by {ada,gpr}-ts-mode.
-(global-set-key [C-S-down-mouse-1] #'mouse-buffer-menu)
+(global-set-key [C-S-mouse-1] #'mouse-buffer-menu)
 
 (setq enable-local-variables 1)
 (put 'narrow-to-region 'disabled nil)
